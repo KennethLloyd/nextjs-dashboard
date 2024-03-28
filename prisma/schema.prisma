@@ -8,28 +8,30 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model customers {
-  id        String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name      String @db.VarChar(255)
-  email     String @db.VarChar(255)
-  image_url String @db.VarChar(255)
+model Customer {
+  id        String    @id @default(uuid())
+  name      String    @db.VarChar(255)
+  email     String    @db.VarChar(255)
+  image_url String    @db.VarChar(255)
+  invoices  Invoice[]
 }
 
-model invoices {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customer_id String   @db.Uuid
-  amount      Int
-  status      String   @db.VarChar(255)
-  date        DateTime @db.Date
+model Invoice {
+  id         String   @id @default(uuid())
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  amount     Int
+  status     String   @db.VarChar(255)
+  date       DateTime @db.Date
 }
 
-model revenue {
+model Revenue {
   month   String @unique @db.VarChar(4)
   revenue Int
 }
 
-model users {
-  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+model User {
+  id       String @id @default(uuid())
   name     String @db.VarChar(255)
   email    String @unique
   password String
