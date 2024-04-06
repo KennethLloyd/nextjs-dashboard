@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { Prisma } from '@prisma/client';
 import prisma from '@/db';
 import {
   CustomerField,
@@ -6,6 +7,7 @@ import {
   InvoiceForm,
   InvoicesTable,
   User,
+  FilteredInvoice,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -129,34 +131,36 @@ const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
-) {
+): Promise<FilteredInvoice[]> {
   noStore();
 
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const invoices = await sql<InvoicesTable>`
+    // Since Prisma doesn't yet support 'contains' for non-string fields (date, int), we will use raw query
+    const invoices: FilteredInvoice[] = await prisma.$queryRaw(
+      Prisma.sql`
       SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
+        i.id,
+        i.amount,
+        i.date,
+        i.status,
+        c.name,
+        c.email,
+        c.image_url
+      FROM "Invoice" i
+      JOIN "Customer" c ON i."customerId" = c.id
       WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
+        c.name ILIKE ${`%${query}%`} OR
+        c.email ILIKE ${`%${query}%`} OR
+        i.amount::text ILIKE ${`%${query}%`} OR
+        i.date::text ILIKE ${`%${query}%`} OR
+        i.status ILIKE ${`%${query}%`}
+      ORDER BY i.date DESC
+        LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`,
+    );
 
-    return invoices.rows;
+    return invoices;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoices.');
