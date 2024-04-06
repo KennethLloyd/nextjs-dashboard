@@ -5,7 +5,6 @@ import {
   CustomerField,
   CustomersTableType,
   InvoiceForm,
-  InvoicesTable,
   User,
   FilteredInvoice,
 } from './definitions';
@@ -39,7 +38,7 @@ export async function fetchLatestInvoices() {
   noStore();
 
   try {
-    const data = await prisma.invoice.findMany({
+    const latestInvoices = await prisma.invoice.findMany({
       select: {
         id: true,
         amount: true,
@@ -56,14 +55,6 @@ export async function fetchLatestInvoices() {
         date: 'desc',
       },
     });
-
-    const latestInvoices = data.map((invoice) => ({
-      ...invoice,
-      name: invoice.customer.name,
-      image_url: invoice.customer.image_url,
-      email: invoice.customer.email,
-      amount: formatCurrency(invoice.amount),
-    }));
 
     return latestInvoices;
   } catch (error) {
@@ -128,6 +119,7 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
+// Because this is a raw query, we cannot infer types from Prisma, so we have to define them ourselves
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
