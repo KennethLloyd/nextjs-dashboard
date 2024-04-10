@@ -163,18 +163,24 @@ export async function fetchInvoicesPages(query: string) {
   noStore();
 
   try {
-    const count = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
+    // Since Prisma doesn't yet support 'contains' for non-string fields (date, int), we will use raw query
+    const result: { count: number }[] = await prisma.$queryRaw(
+      Prisma.sql`
+      SELECT
+        COUNT(*)
+      FROM "Invoice" i
+      JOIN "Customer" c ON i."customerId" = c.id
+      WHERE
+        c.name ILIKE ${`%${query}%`} OR
+        c.email ILIKE ${`%${query}%`} OR
+        i.amount::text ILIKE ${`%${query}%`} OR
+        i.date::text ILIKE ${`%${query}%`} OR
+        i.status ILIKE ${`%${query}%`}`,
+    );
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const count = result[0].count;
+    const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
+
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
