@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import LogoutIcon from '@mui/icons-material/Logout';
 import NavLinks from '@/app/ui/dashboard/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
-import { PowerIcon } from '@heroicons/react/24/outline';
 
 export default function SideNav() {
   return (
@@ -14,24 +18,83 @@ export default function SideNav() {
         px: { mobile: '0.75rem', tablet: '0' },
       }}
     >
-      <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
-        href="/"
-      >
-        <div className="w-32 text-white md:w-40">
-          <AcmeLogo />
-        </div>
+      <Link className="link-to-home" href="/">
+        <Box
+          className="brand-container"
+          display={'flex'}
+          alignItems={'flex-end'}
+          justifyContent={'flex-start'}
+          borderRadius={'0.375rem'}
+          p={'1rem'}
+          mb={'0.5rem'}
+          sx={{
+            backgroundColor: 'rgb(47 111 235)',
+            height: { mobile: '5rem', tablet: '10rem' },
+          }}
+        >
+          <Box
+            className="logo-container"
+            color={'white'}
+            sx={{
+              width: { mobile: '8rem', tablet: '10rem' },
+            }}
+          >
+            <AcmeLogo />
+          </Box>
+        </Box>
       </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+      <Box
+        className="navbar-actions-container"
+        display={'flex'}
+        justifyContent={'space-between'}
+        flexGrow={1}
+        gap={'0.5rem'}
+        sx={{
+          flexDirection: { mobile: 'row', tablet: 'column' },
+        }}
+      >
         <NavLinks />
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-        <form>
-          <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-            <PowerIcon className="w-6" />
-            <div className="hidden md:block">Sign Out</div>
-          </button>
-        </form>
-      </div>
+        <Box
+          className="navlinks-signout-divider"
+          flexGrow={1}
+          borderRadius={'0.375rem'}
+          height={'auto'}
+          width={'100%'}
+          sx={{
+            backgroundColor: 'rgb(249 250 251)',
+            display: { mobile: 'none', tablet: 'block' },
+          }}
+        />
+        <Box
+          className="signout-button-container"
+          sx={{
+            display: { mobile: 'none', tablet: 'block' },
+            backgroundColor: 'rgb(249 250 251)',
+            '&:hover': {
+              backgroundColor: 'rgb(224 242 254)',
+            },
+          }}
+        >
+          <Button variant="text" startIcon={<LogoutIcon />} fullWidth>
+            <Typography fontSize={'0.875rem'}>Sign Out</Typography>
+          </Button>
+        </Box>
+        <Box
+          className="signout-icon-button-container-mobile-only"
+          sx={{
+            display: { mobile: 'flex', tablet: 'none' },
+            alignItems: 'center',
+            backgroundColor: 'rgb(249 250 251)',
+            '&:hover': {
+              backgroundColor: 'rgb(224 242 254)',
+            },
+          }}
+        >
+          <IconButton color="inherit" aria-label="sign out">
+            <LogoutIcon />
+          </IconButton>
+        </Box>
+      </Box>
     </Stack>
   );
 }
