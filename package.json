@@ -13,7 +13,14 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.12",
     "@heroicons/react": "^2.0.18",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
+    "@mui/material-nextjs": "^5.15.11",
     "@prisma/client": "^5.11.0",
     "@tailwindcss/forms": "^0.5.7",
     "@vercel/postgres": "^0.5.1",
@@ -30,6 +37,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@emotion/eslint-plugin": "^11.11.0",
     "@types/bcrypt": "^5.0.1",
     "@types/node": "^20.11.30",
     "@types/react": "18.2.21",
